@@ -44,10 +44,6 @@ When /^(.*) within (.*[^:]):$/ do |nested_step, parent, table_or_string|
   with_scope(parent) { step("#{nested_step}:", table_or_string) }
 end
 
-Given /^(?:|I )am on (.+)$/ do |page_name|
-  visit _path_to(page_name)
-end
-
 When /^(?:|I )go to (.+)$/ do |page_name|
   visit _path_to(page_name)
 end
@@ -247,22 +243,6 @@ end
 Then /^the radio button "([^"]*)" should( not)? be (?:checked|selected)$/ do |field, negate|
   patiently do
     page.send((negate ? :has_no_checked_field? : :has_checked_field?), field)
-  end
-end
-
-Then /^(?:|I )should be on (.+)$/ do |page_name|
-  patiently do
-    fragment = URI.parse(current_url).fragment
-    fragment.sub!(/[#?].*/, '') if fragment # most js frameworks will usually use ? and # for params, we dont care about those
-    current_path = URI.parse(current_url).path
-    current_path << "##{fragment}" if fragment.present?
-    expected_path = _path_to(page_name)
-
-    # Consider two pages equal if they only differ by a trailing slash.
-    current_path = expected_path if current_path.chomp("/") == expected_path.chomp("/")
-    current_path = expected_path if current_path.gsub("/#", "#") == expected_path.gsub("/#", "#")
-
-    current_path.should == expected_path
   end
 end
 
